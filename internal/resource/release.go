@@ -49,6 +49,8 @@ type InstallReleaseRequest struct {
 	Chart     string                 `json:"chart"`
 	Version   string                 `json:"version"`
 	Values    map[string]interface{} `json:"values"`
+	Wait      bool                   `json:"wait"`
+	Timeout   int64                  `json:"timeout"`
 }
 
 // ReleaseResource represents helm releases
@@ -161,7 +163,7 @@ func (rr *ReleaseResource) installRelease(req *restful.Request, res *restful.Res
 		errorResponse(res, errFailToReadResponse)
 		return
 	}
-	out, err := rr.controller.InstallRelease(in.Name, in.Namespace, in.Repo, in.Chart, in.Version, in.Values)
+	out, err := rr.controller.InstallRelease(in.Name, in.Namespace, in.Repo, in.Chart, in.Version, in.Values, in.Wait, in.Timeout)
 	if err != nil {
 		errorResponse(res, errFailToInstallRelease)
 		return
