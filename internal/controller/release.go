@@ -42,7 +42,7 @@ func (rc *ReleaseController) ListReleases(req *tiller.ListReleasesRequest) (*til
 }
 
 // InstallRelease installs a new release of the provided chart
-func (rc *ReleaseController) InstallRelease(name, namespace, repo, chart, version string, values map[string]interface{}) (*tiller.InstallReleaseResponse, error) {
+func (rc *ReleaseController) InstallRelease(name, namespace, repo, chart, version string, values map[string]interface{}, wait bool, timeout int64) (*tiller.InstallReleaseResponse, error) {
 	chartDetails, err := rc.repoController.ChartDetails(repo, chart, version)
 	if err != nil {
 		log.WithError(err).Error("unable to get chart details")
@@ -72,6 +72,8 @@ func (rc *ReleaseController) InstallRelease(name, namespace, repo, chart, versio
 		Namespace: namespace,
 		Chart:     inChart,
 		Values:    config,
+		Wait:      wait,
+		Timeout:   timeout,
 	}
 
 	res, err := rc.tillerClient.InstallRelease(req)

@@ -1,6 +1,7 @@
 APP=rudder
 VERSION=latest
 LDFLAGS=-ldflags "-X github.com/AcalephStorage/rudder/cmd.version=${VERSION}"
+IMAGE_NAME=quay.io/acaleph/rudder
 
 all: deps build
 
@@ -25,7 +26,7 @@ build: prereq
 package:
 	@echo '--> packaging...'
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -o build/bin/${APP} ${LDFLAGS} ./cmd
-	@docker build -t quay.io/acaleph/rudder:${VERSION} .
+	@docker build -t ${IMAGE_NAME}:${VERSION} .
 
 deploy: package
 	@echo '--> deploying...'
