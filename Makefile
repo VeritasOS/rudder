@@ -21,7 +21,7 @@ deps: prereq
 build: prereq
 	@echo '--> building...'
 	@go fmt ./...
-	go build -o build/bin/${APP} ${LDFLAGS} ./cmd
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/bin/${APP} ${LDFLAGS} ./cmd
 
 package:
 	@echo '--> packaging...'
