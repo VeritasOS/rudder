@@ -1,10 +1,10 @@
-hash: 430030e8333d0a0f57ebab9f83fdb0fe831dbababd034ae13d7e4e1c90392676
-updated: 2018-01-25T13:32:55.683143936+05:30
+hash: dcf2422ef8376c4ce5d2d819505dca7dd09a09edb86ddf733e8231a65b0b0311
+updated: 2018-05-25T18:51:12.499722+05:30
 imports:
 - name: github.com/AcalephStorage/go-auth
   version: a94da01afb9889ea6537e78aa6a7c0bfac1f197d
-- name: github.com/blang/semver
-  version: 31b736133b98f26d5e078ec9eb591666edfd091f
+- name: github.com/BurntSushi/toml
+  version: b26d9c308763d68093482582cea63d69be07a0f0
 - name: github.com/coreos/go-oidc
   version: 8472879a4fc0182e34ed1a1edf711625a9c9fab2
 - name: github.com/emicklei/go-restful
@@ -12,12 +12,14 @@ imports:
   subpackages:
   - log
   - swagger
+- name: github.com/facebookgo/atomicfile
+  version: 2de1f203e7d5e386a6833233882782932729f27e
 - name: github.com/facebookgo/symwalk
   version: 42004b9f322246749dd73ad71008b1f3160c0052
 - name: github.com/ghodss/yaml
   version: a54de18a07046d8c4b26e9327698a2ebb9285b36
 - name: github.com/gobwas/glob
-  version: bea32b9cd2d6f55753d94a28e959b13f0244797a
+  version: 5ccd90ef52e1e632236f7326478d4faa74f99438
   subpackages:
   - compiler
   - match
@@ -26,28 +28,22 @@ imports:
   - syntax/lexer
   - util/runes
   - util/strings
-- name: github.com/golang/glog
-  version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/protobuf
-  version: df1d3ca07d2d07bba352d5b73c4313b4e2a6203e
+  version: 2bba0603135d7d7f5cb73b2125beeda19c09f4ef
   subpackages:
   - proto
   - ptypes/any
   - ptypes/timestamp
 - name: github.com/Masterminds/semver
   version: 3f0ab6d4ab4bed1c61caf056b63a6e62190c7801
-- name: github.com/naoina/go-stringutil
-  version: 6b638e95a32d0c1131db0e7fe83775cbea4a0d0b
-- name: github.com/naoina/toml
-  version: e6f5723bf2a66af014955e0888881314cf294129
-  subpackages:
-  - ast
 - name: github.com/pquerna/cachecontrol
   version: c97913dcbd76de40b051a9b4cd827f7eaeb7a868
   subpackages:
   - cacheobject
 - name: github.com/Sirupsen/logrus
   version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
+- name: github.com/spf13/pflag
+  version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: github.com/urfave/cli
   version: a14d7d367bc02b1f57d88de97926727f2d936387
 - name: golang.org/x/crypto
@@ -83,16 +79,14 @@ imports:
   version: 4f7eeb5305a4ba1966344836ba4af9996b7b4e05
   subpackages:
   - internal
-  - internal/app_identity
   - internal/base
   - internal/datastore
   - internal/log
-  - internal/modules
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
 - name: google.golang.org/grpc
-  version: 0032a855ba5c8a3c8e0d71c2deef354b70af1584
+  version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
   subpackages:
   - codes
   - credentials
@@ -109,12 +103,20 @@ imports:
   - json
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+- name: k8s.io/apimachinery
+  version: bea47ba1bc0ea54dd3b057916e32338dbeb79011
+  subpackages:
+  - pkg/version
 - name: k8s.io/helm
-  version: d83c245fc324117885ed83afc90ac74afed271b4
+  version: 7cf31e8d9a026287041bae077b09165be247ae66
   subpackages:
   - pkg/chartutil
+  - pkg/getter
   - pkg/helm
+  - pkg/helm/environment
+  - pkg/helm/helmpath
   - pkg/ignore
+  - pkg/plugin
   - pkg/proto/hapi/chart
   - pkg/proto/hapi/release
   - pkg/proto/hapi/services
@@ -124,37 +126,4 @@ imports:
   - pkg/tlsutil
   - pkg/urlutil
   - pkg/version
-- name: k8s.io/kubernetes
-  version: e8c167a115ec662726904265d17f75a6d79d78d8
-  subpackages:
-  - pkg/api
-  - pkg/api/errors
-  - pkg/api/meta
-  - pkg/api/unversioned
-  - pkg/api/v1
-  - pkg/apis/apps/v1beta1
-  - pkg/apis/batch
-  - pkg/apis/batch/v1
-  - pkg/apis/extensions
-  - pkg/apis/extensions/v1beta1
-  - pkg/client/clientset_generated/internalclientset
-  - pkg/client/clientset_generated/internalclientset/typed/core/internalversion
-  - pkg/client/clientset_generated/internalclientset/typed/extensions/internalversion
-  - pkg/client/restclient
-  - pkg/client/typed/discovery
-  - pkg/client/unversioned
-  - pkg/client/unversioned/clientcmd
-  - pkg/client/unversioned/portforward
-  - pkg/client/unversioned/remotecommand
-  - pkg/fields
-  - pkg/kubectl
-  - pkg/kubectl/cmd/util
-  - pkg/kubectl/resource
-  - pkg/labels
-  - pkg/runtime
-  - pkg/util/intstr
-  - pkg/util/strategicpatch
-  - pkg/util/wait
-  - pkg/version
-  - pkg/watch
 testImports: []
