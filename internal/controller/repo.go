@@ -158,7 +158,6 @@ func (rc *RepoController) ChartDetails(repoName, chartName, chartVersion string)
 // but expires at a set time.
 func (rc *RepoController) readFromCacheOrURL(url string) ([]byte, error) {
 	log.Debugf("Fetching resource from cache or %s...", url)
-	log.Infof("Fetching resource from url: %s", url)
 	log.Infof("Cache life time configured is %s", rc.cacheLifetime)
 
 	mustReload := false
@@ -170,16 +169,16 @@ func (rc *RepoController) readFromCacheOrURL(url string) ([]byte, error) {
 	fi, err := os.Stat(filePath)
 	if err != nil {
 		// file may not exist : needs debug log
-		log.Debug("cache not found")
+		log.Info("cache not found")
 		mustReload = true
 	} else {
 		// outdated
-		log.Debug("cache found")
+		log.Info("cache found")
 		mustReload = util.IsOutdated(fi.ModTime(), rc.cacheLifetime)
 	}
 
 	if mustReload {
-		log.Debug("cache not found or outdated. getting from URL")
+		log.Info("cache not found or outdated. getting from URL")
 		// get from url
 		out, err := util.HTTPGet(url)
 		if err != nil {
