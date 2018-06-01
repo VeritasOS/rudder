@@ -85,7 +85,7 @@ func main() {
 			Name:   helmRepoCacheLifetimeFlag,
 			Usage:  "cache lifetime. should be in duration format (eg. 10m). valid time units are 'ns', 'us' (or 'µs'), 'ms', 's', 'm', 'h'",
 			EnvVar: "RUDDER_HELM_REPO_CACHE_LIFETIME",
-			Value:  10 * time.Minute,
+			Value:  1 * time.Minute,
 		},
 		cli.StringFlag{
 			Name:   swaggerUIPathFlag,

@@ -158,6 +158,9 @@ func (rc *RepoController) ChartDetails(repoName, chartName, chartVersion string)
 // but expires at a set time.
 func (rc *RepoController) readFromCacheOrURL(url string) ([]byte, error) {
 	log.Debugf("Fetching resource from cache or %s...", url)
+	log.Infof("Fetching resource from url: %s", url)
+	log.Infof("Cache life time configured is %s", rc.cacheLifetime)
+
 	mustReload := false
 
 	cacheFile := util.EncodeMD5Hex(url)
