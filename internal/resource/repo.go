@@ -14,7 +14,6 @@ var (
 	errFailToGetCharts      = restful.NewError(http.StatusBadRequest, "unable to fetch charts")
 	errFailToListVersions   = restful.NewError(http.StatusBadRequest, "unable to fetch chart versions")
 	errFailToGetChartDetail = restful.NewError(http.StatusBadRequest, "unable to fetch chart details")
-	errFailToRefreshCache   = restful.NewError(http.StatusBadRequest, "unable to refresh cache")
 )
 
 // RepoResource represents helm repositories
@@ -68,8 +67,8 @@ func (rr *RepoResource) Register(container *restful.Container) {
 		Param(ws.PathParameter("version", "the helm chart version")).
 		Writes(controller.ChartDetail{}))
 
-	// PUT /api/v1/repo/{repo}/cache/refresh
-	ws.Route(ws.PUT("{repo}/cache/refresh").To(rr.refreshCache).
+	// PUT /api/v1/repo/{repo}/cache
+	ws.Route(ws.PUT("{repo}/cache").To(rr.refreshCache).
 		Doc("Endpoint to refresh rudder cache on demand").
 		Operation("refreshCache").
 		Param(ws.PathParameter("repo", "the helm repository")))
@@ -144,10 +143,9 @@ func (rr *RepoResource) refreshCache(req *restful.Request, res *restful.Response
 	data, err := rr.controller.RefreshCache(repoName)
 
 	if err != nil {
-		errorResponse(res, errFailToRefreshCache)
+		errorResponse(res, restful.NewError(http.StatusBadRequest, err.Error()))
 		return
 	}
-	if err := res.WriteEntity(data); err != nil {
-		errorResponse(res, errFailToWriteResponse)
-	}
+	_ = data
+	res.WriteHeader(http.StatusOK)
 }
