@@ -67,6 +67,12 @@ func (rr *RepoResource) Register(container *restful.Container) {
 		Param(ws.PathParameter("version", "the helm chart version")).
 		Writes(controller.ChartDetail{}))
 
+	// PUT /api/v1/repo/{repo}/cache
+	ws.Route(ws.PUT("{repo}/cache").To(rr.refreshCache).
+		Doc("Endpoint to refresh rudder cache on demand").
+		Operation("refreshCache").
+		Param(ws.PathParameter("repo", "the helm repository")))
+
 	container.Add(ws)
 }
 
@@ -128,4 +134,18 @@ func (rr *RepoResource) getChart(req *restful.Request, res *restful.Response) {
 	if err := res.WriteEntity(chartDetail); err != nil {
 		errorResponse(res, errFailToWriteResponse)
 	}
+}
+
+// refreshCache to refresh the rudder local cache for repo
+func (rr *RepoResource) refreshCache(req *restful.Request, res *restful.Response) {
+
+	repoName := req.PathParameter("repo")
+	data, err := rr.controller.RefreshCache(repoName)
+
+	if err != nil {
+		errorResponse(res, restful.NewError(http.StatusBadRequest, err.Error()))
+		return
+	}
+	_ = data
+	res.WriteHeader(http.StatusOK)
 }
