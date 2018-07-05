@@ -104,7 +104,7 @@ func (rc *RepoController) ChartDetails(repoName, chartName, chartVersion string)
 	}
 	// get the first URL
 	chartURL := version.URLs[0]
-	log.Infof("fetching Helm Chart '%s' from URL: %s", chartName, indexURL)
+	log.Infof("fetching Helm Chart '%s' from URL: %s", chartName, chartURL)
 	data, err := rc.readFromCacheOrURL(chartURL, false)
 	if err != nil {
 		log.WithError(err).Errorf("Unable to get chart from cache or %s", chartURL)
@@ -175,7 +175,7 @@ func (rc *RepoController) readFromCacheOrURL(url string, forceCacheReload bool) 
 		fi, err := os.Stat(filePath)
 		if err != nil {
 			// file may not exist : needs debug log
-			log.InfoF("cache not found, Hence getting from URL: %s", url)
+			log.Infof("cache not found, Hence getting from URL: %s", url)
 			mustReload = true
 		} else {
 			// outdated
@@ -183,9 +183,9 @@ func (rc *RepoController) readFromCacheOrURL(url string, forceCacheReload bool) 
 			mustReload = util.IsOutdated(fi.ModTime(), rc.cacheLifetime)
 
 			if mustReload {
-				log.InfoF("cache is outdated, Hence getting from URL: %s", url)
+				log.Infof("cache is outdated, Hence getting from URL: %s", url)
 			} else {
-				log.InfoF("cache is not outdated, Hence reusing the cache")
+				log.Infof("cache is not outdated, Hence reusing the cache")
 			}
 		}
 	}
@@ -265,7 +265,7 @@ func filterCharts(charts map[string]repo.ChartVersions, filter string) {
 
 //RefreshCache refreshes the rudder cache on demand and returns no response
 func (rc *RepoController) RefreshCache(repoName string) ([]byte, error) {
-  log.Infof("refreshing cache for Repo: %s", repoName)
+	log.Infof("refreshing cache for Repo: %s", repoName)
 	r, err := rc.findRepo(repoName)
 	if err != nil {
 		log.WithError(err).Errorf("unable to find repo %s", repoName)
