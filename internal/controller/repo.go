@@ -72,6 +72,7 @@ func (rc *RepoController) ListCharts(repoName, filter string) (charts map[string
 	}
 	repoURL := r.URL
 	indexURL := repoURL + "/index.yaml"
+	log.Infof("fetching index.yaml from URL: %s", indexURL)
 	data, err := rc.readFromCacheOrURL(indexURL, false)
 	if err != nil {
 		log.WithError(err).Error("Unable to get index.yaml from cache or %s", indexURL)
@@ -103,6 +104,7 @@ func (rc *RepoController) ChartDetails(repoName, chartName, chartVersion string)
 	}
 	// get the first URL
 	chartURL := version.URLs[0]
+	log.Infof("fetching Helm Chart '%s' from URL: %s", chartName, indexURL)
 	data, err := rc.readFromCacheOrURL(chartURL, false)
 	if err != nil {
 		log.WithError(err).Errorf("Unable to get chart from cache or %s", chartURL)
@@ -157,7 +159,7 @@ func (rc *RepoController) ChartDetails(repoName, chartName, chartVersion string)
 // readFromCacheOrURL handles reading of the charts. Charts are stored locally for faster access
 // but expires at a set time.
 func (rc *RepoController) readFromCacheOrURL(url string, forceCacheReload bool) ([]byte, error) {
-	log.Debugf("Fetching resource from cache or %s...", url)
+	log.Infof("fetching resource from cache or %s...", url)
 	mustReload := false
 
 	cacheFile := util.EncodeMD5Hex(url)
@@ -166,18 +168,25 @@ func (rc *RepoController) readFromCacheOrURL(url string, forceCacheReload bool) 
 	if forceCacheReload {
 
 		mustReload = forceCacheReload
+		log.Info("forcefully refreshing cache")
 
 	} else {
-		log.Debugf("checking cache: %s", filePath)
+		log.Infof("checking cache: %s", filePath)
 		fi, err := os.Stat(filePath)
 		if err != nil {
 			// file may not exist : needs debug log
-			log.Debug("cache not found")
+			log.InfoF("cache not found, Hence getting from URL: %s", url)
 			mustReload = true
 		} else {
 			// outdated
-			log.Debug("cache found")
+			log.Info("cache found, Verifying whether cache is outdated or not")
 			mustReload = util.IsOutdated(fi.ModTime(), rc.cacheLifetime)
+
+			if mustReload {
+				log.InfoF("cache is outdated, Hence getting from URL: %s", url)
+			} else {
+				log.InfoF("cache is not outdated, Hence reusing the cache")
+			}
 		}
 	}
 	if mustReload {
@@ -186,7 +195,7 @@ func (rc *RepoController) readFromCacheOrURL(url string, forceCacheReload bool) 
 		out, err := util.HTTPGet(url)
 		if err != nil {
 			// unable to download
-			log.Debugf("unable to download from %s", url)
+			log.WithError(err).Errorf("unable to download from %s", url)
 			return nil, err
 		}
 		// save to file
@@ -256,6 +265,7 @@ func filterCharts(charts map[string]repo.ChartVersions, filter string) {
 
 //RefreshCache refreshes the rudder cache on demand and returns no response
 func (rc *RepoController) RefreshCache(repoName string) ([]byte, error) {
+  log.Infof("refreshing cache for Repo: %s", repoName)
 	r, err := rc.findRepo(repoName)
 	if err != nil {
 		log.WithError(err).Errorf("unable to find repo %s", repoName)
@@ -263,6 +273,7 @@ func (rc *RepoController) RefreshCache(repoName string) ([]byte, error) {
 	}
 	repoURL := r.URL
 	indexURL := repoURL + "/index.yaml"
+	log.Infof("fetching index.yaml from URL: %s", indexURL)
 	data, err := rc.readFromCacheOrURL(indexURL, true)
 
 	if err != nil {
