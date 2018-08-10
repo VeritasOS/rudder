@@ -173,3 +173,25 @@ func (rc *ReleaseController) UpdateRelease(name string, chart string, repo strin
 	}
 	return res, nil
 }
+
+// Rollback a already installed release of the provided chart
+func (rc *ReleaseController) RollbackRelease(name string, dryRun bool, disableHooks bool, version int32, recreate bool, timeout int64, wait bool, force bool) (*tiller.RollbackReleaseResponse, error) {
+
+	req := &tiller.RollbackReleaseRequest{
+		Name:         name,
+		DryRun:       dryRun,
+		DisableHooks: disableHooks,
+		Version:      version,
+		Recreate:     recreate,
+		Timeout:      timeout,
+		Wait:         wait,
+		Force:        force,
+	}
+
+	res, err := rc.tillerClient.RollbackRelease(req)
+	if err != nil {
+		log.WithError(err).Error("unable to update release")
+		return nil, err
+	}
+	return res, nil
+}

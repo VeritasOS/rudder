@@ -40,6 +40,7 @@ var (
 	errFailtToUninstallRelease = restful.NewError(http.StatusInternalServerError, "unable to uninstall releases")
 	errFailToGetRelease        = restful.NewError(http.StatusInternalServerError, "unable to get release content and status")
 	errFailToUpdateRelease     = restful.NewError(http.StatusInternalServerError, "unable to update release")
+	errFailToRollbackRelease   = restful.NewError(http.StatusInternalServerError, "unable to rollback release")
 )
 
 // InstallReleaseRequest is the request body needed for installing a new release
@@ -69,6 +70,27 @@ type UpdateReleaseRequest struct {
 	Wait         bool                   `json:"wait"`
 	ReuseValues  bool                   `json:"reuseValues"`
 	Force        bool                   `json:"force"`
+}
+
+// RollbackReleaseRequest is the request body needed to rollback a release
+type RollbackReleaseRequest struct {
+	// The name of the release
+	Name string `json:"name"`
+	// dry_run, if true, will run through the release logic but no create
+	DryRun bool `json:"dryRun"`
+	// DisableHooks causes the server to skip running any hooks for the rollback
+	DisableHooks bool `json:"disableHooks"`
+	// Version is the version of the release to deploy.
+	Version int32 `json:"version"`
+	// Performs pods restart for resources if applicable
+	Recreate bool `json:"recreate"`
+	// timeout specifies the max amount of time any kubernetes client command can run.
+	Timeout int64 `json:"timeout"`
+	// wait, if true, will wait until all Pods, PVCs, and Services are in a ready state
+	// before marking the release as successful. It will wait for as long as timeout
+	Wait bool `json:"wait"`
+	// Force resource update through delete/recreate if needed.
+	Force bool `json:"wait"`
 }
 
 // ReleaseResource represents helm releases
@@ -132,6 +154,21 @@ func (rr *ReleaseResource) Register(container *restful.Container) {
 		Writes(tiller.UpdateReleaseResponse{}))
 
 	container.Add(ws)
+
+	ws1 := new(restful.WebService)
+	ws1.Path("/api/v1/releases/rollback").
+		Doc("Helm releases").
+		Consumes(restful.MIME_JSON).
+		Produces(restful.MIME_JSON)
+
+	// PUT /api/v1/releases/rollback
+	ws1.Route(ws1.PUT("").To(rr.rollbackRelease).
+		Doc("rollback release. defaults: version=latest.").
+		Operation("rollbackRelease").
+		Reads(RollbackReleaseRequest{}).
+		Writes(tiller.RollbackReleaseResponse{}))
+
+	container.Add(ws1)
 
 }
 
@@ -254,13 +291,30 @@ func (rr *ReleaseResource) getRelease(req *restful.Request, res *restful.Respons
 
 }
 
-// GET api/v1/releases/:name/:version/:status {create request body}
-func (rr *ReleaseResource) releaseStatus(req *restful.Request, res *restful.Response) {
-	// TODO
+// Post api/v1/releases/rollback {request body passed}
+func (rr *ReleaseResource) rollbackRelease(req *restful.Request, res *restful.Response) {
+	in := RollbackReleaseRequest{}
+
+	if err := req.ReadEntity(&in); err != nil {
+		errorResponse(res, errFailToReadResponse)
+		return
+	}
+
+	out, err := rr.controller.RollbackRelease(in.Name, in.DryRun, in.DisableHooks, in.Version, in.Recreate, in.Timeout, in.Wait, in.Force)
+
+	if err != nil {
+		errorResponse(res, errFailToRollbackRelease)
+		return
+	}
+
+	if err := res.WriteEntity(out); err != nil {
+		errorResponse(res, errFailToWriteResponse)
+	}
+
 }
 
-// POST ??? I DUNNOT KNOW
-func (rr *ReleaseResource) rollbackRelease(req *restful.Request, res *restful.Response) {
+// GET api/v1/releases/:name/:version/:status {create request body}
+func (rr *ReleaseResource) releaseStatus(req *restful.Request, res *restful.Response) {
 	// TODO
 }
 
