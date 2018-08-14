@@ -19,3 +19,10 @@ func errorResponse(res *restful.Response, err restful.ServiceError) {
 		log.WithError(err).Error("unable to write error")
 	}
 }
+
+func errorResponsetest(res *restful.Response, err error) {
+	log.WithError(err).Error(err.Error())
+	if err := res.WriteErrorString(http.StatusBadRequest, err.Error()); err != nil {
+		log.WithError(err).Error("unable to write error")
+	}
+}

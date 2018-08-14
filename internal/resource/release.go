@@ -170,7 +170,7 @@ func (rr *ReleaseResource) listReleases(req *restful.Request, res *restful.Respo
 
 	response, err := rr.controller.ListReleases(request)
 	if err != nil {
-		errorResponse(res, errFailToListReleases)
+		errorResponsetest(res, err)
 		return
 	}
 	if err := res.WriteEntity(response); err != nil {
@@ -228,7 +228,7 @@ func (rr *ReleaseResource) uninstallRelease(req *restful.Request, res *restful.R
 	_, purge := req.Request.URL.Query()["purge"]
 	out, err := rr.controller.UninstallRelease(releaseName, purge)
 	if err != nil {
-		errorResponse(res, errFailtToUninstallRelease)
+		errorResponsetest(res, err)
 		return
 	}
 	if err := res.WriteEntity(out); err != nil {
