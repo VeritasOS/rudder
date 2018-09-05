@@ -102,3 +102,14 @@ func (tc *TillerClient) UpdateRelease(req *tiller.UpdateReleaseRequest) (res *ti
 	})
 	return
 }
+
+// RollbackRelease rollback a release
+func (tc *TillerClient) RollbackRelease(req *tiller.RollbackReleaseRequest) (res *tiller.RollbackReleaseResponse, err error) {
+	tc.execute(func(rsc tiller.ReleaseServiceClient) {
+		res, err = rsc.RollbackRelease(tc.context, req)
+		if err != nil {
+			log.Debug("unable to rollback release")
+		}
+	})
+	return
+}
